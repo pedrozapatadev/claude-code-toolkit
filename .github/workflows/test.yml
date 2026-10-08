@@ -5,10 +5,18 @@ permissions:
 jobs:
   fixtures:
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: git config --global user.email ci@example.com && git config --global user.name ci && git config --global init.defaultBranch main
       - run: ./run-tests.sh
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: shellcheck -S error hooks/*/*.sh hooks/*/lib/*.sh scripts/*/*.sh run-tests.sh
+      - run: python3 -m py_compile hooks/*/lib/*.py
+      - run: for f in .claude-plugin/*.json hooks/hooks.json settings.example.json; do jq -e . "$f" >/dev/null || exit 1; done
