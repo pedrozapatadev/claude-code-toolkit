@@ -4,20 +4,43 @@
       {
         "matcher": "Edit|Write",
         "hooks": [
-          { "type": "command", "command": "bash ~/.claude/toolkit/hooks/commit-guard/protected-files.sh", "timeout": 5 }
+          {
+            "type": "command",
+            "command": "bash ~/.claude/toolkit/hooks/commit-guard/protected-files.sh",
+            "timeout": 5
+          }
         ]
       },
       {
         "matcher": "Bash",
         "hooks": [
-          { "type": "command", "command": "bash ~/.claude/toolkit/hooks/commit-guard/pre-commit-gate.sh", "timeout": 10, "if": "Bash(*git*commit*)" }
+          {
+            "type": "command",
+            "command": "bash ~/.claude/toolkit/hooks/commit-guard/pre-commit-gate.sh",
+            "timeout": 10,
+            "if": "Bash(*git*commit*)"
+          }
+        ]
+      },
+      {
+        "matcher": "Workflow",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/toolkit/hooks/workflow-lint/workflow-lint.sh",
+            "timeout": 5
+          }
         ]
       }
     ],
     "UserPromptSubmit": [
       {
         "hooks": [
-          { "type": "command", "command": "bash ~/.claude/toolkit/hooks/context-nudge/context-nudge.sh", "timeout": 5 }
+          {
+            "type": "command",
+            "command": "bash ~/.claude/toolkit/hooks/context-nudge/context-nudge.sh",
+            "timeout": 5
+          }
         ]
       }
     ],
@@ -25,7 +48,11 @@
       {
         "matcher": "*",
         "hooks": [
-          { "type": "command", "command": "bash ~/.claude/toolkit/hooks/verify-gate/auto-verify.sh", "timeout": 120 }
+          {
+            "type": "command",
+            "command": "bash ~/.claude/toolkit/hooks/verify-gate/auto-verify.sh",
+            "timeout": 120
+          }
         ]
       }
     ]

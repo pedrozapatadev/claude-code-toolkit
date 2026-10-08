@@ -4,27 +4,54 @@
       {
         "matcher": "Edit|Write",
         "hooks": [
-          { "type": "command", "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/commit-guard/protected-files.sh\"", "timeout": 5 }
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/commit-guard/protected-files.sh\"",
+            "timeout": 5
+          }
         ]
       },
       {
         "matcher": "Bash",
         "hooks": [
-          { "type": "command", "if": "Bash(*git*commit*)", "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/commit-guard/pre-commit-gate.sh\"", "timeout": 10 }
+          {
+            "type": "command",
+            "if": "Bash(*git*commit*)",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/commit-guard/pre-commit-gate.sh\"",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Workflow",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/workflow-lint/workflow-lint.sh\"",
+            "timeout": 5
+          }
         ]
       }
     ],
     "UserPromptSubmit": [
       {
         "hooks": [
-          { "type": "command", "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/context-nudge/context-nudge.sh\"", "timeout": 5 }
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/context-nudge/context-nudge.sh\"",
+            "timeout": 5
+          }
         ]
       }
     ],
     "Stop": [
       {
         "hooks": [
-          { "type": "command", "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/verify-gate/auto-verify.sh\"", "timeout": 120 }
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/verify-gate/auto-verify.sh\"",
+            "timeout": 120
+          }
         ]
       }
     ]
