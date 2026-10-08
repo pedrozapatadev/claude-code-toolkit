@@ -1,0 +1,10 @@
+{
+  "name": "verify-first",
+  "version": "1.0.0",
+  "description": "Deterministic guardrails for Claude Code: a Stop-hook verification gate that never traps the session, a chain-aware commit secret gate, protected files, a context-size nudge, and the five-gates working discipline.",
+  "author": { "name": "Pedro Zapata Medal", "url": "https://github.com/pedrozapatadev" },
+  "homepage": "https://github.com/pedrozapatadev/claude-code-toolkit",
+  "repository": "https://github.com/pedrozapatadev/claude-code-toolkit",
+  "license": "MIT",
+  "keywords": ["hooks", "verification", "guardrails", "skills", "model-routing"]
+}

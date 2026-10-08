@@ -1,0 +1,14 @@
+name: test
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  fixtures:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: git config --global user.email ci@example.com && git config --global user.name ci && git config --global init.defaultBranch main
+      - run: ./run-tests.sh

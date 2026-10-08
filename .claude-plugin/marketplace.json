@@ -1,0 +1,15 @@
+{
+  "name": "pedrozapatadev",
+  "description": "Pedro Zapata Medal's Claude Code plugins: verification-first guardrails for coding agents.",
+  "owner": {
+    "name": "Pedro Zapata Medal",
+    "url": "https://github.com/pedrozapatadev"
+  },
+  "plugins": [
+    {
+      "name": "verify-first",
+      "source": "./",
+      "description": "Verification gate, commit guardrails, context nudge and the five-gates skill."
+    }
+  ]
+}
