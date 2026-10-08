@@ -25,7 +25,11 @@ else
     git rev-parse --verify -q "$ref^{commit}" >/dev/null && BASE=$(git merge-base HEAD "$ref" 2>/dev/null) && [ -n "$BASE" ] && break
     BASE=
   done
-  [ -n "$BASE" ] || BASE=$(git rev-parse --verify -q HEAD || git hash-object -t tree /dev/null)
+  if [ -z "$BASE" ]; then
+    # No main/master ref (e.g. a shallow single-branch CI checkout): only uncommitted changes can be scanned.
+    echo "stub-grep: no main/master ref found; scanning uncommitted changes only (pass --base <ref>; in CI use fetch-depth: 0)" >&2
+    BASE=$(git rev-parse --verify -q HEAD || git hash-object -t tree /dev/null)
+  fi
 fi
 SPEC=(--); for g in "${IGNORE[@]}"; do SPEC+=(":!$g"); done
 # Unified diff with zero context; untracked files diff against /dev/null so all their lines count as added.

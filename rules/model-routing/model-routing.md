@@ -15,7 +15,7 @@ heuristics, not benchmarks. Check current prices before relying on them.
 | Fable 5.1 | `fable` | $10 / $50 | ★☆☆☆☆ | ★★★★★ | ★★★★★ | Taste-critical authorship (design, prose), and the escalation for problems that defeat Opus |
 | Opus 5.5 | `opus` | $4 / $20 | ★★☆☆☆ | ★★★★★ | ★★★★☆ | **Orchestrator**: planning, synthesis, judgment, adversarial review |
 | Sonnet 5.5 | `sonnet` | $2 / $10 | ★★★★☆ | ★★★★☆ | ★★★★☆ | **Workers**: writing code, focused reasoning, one item through one stage |
-| Haiku 5.5 | `haiku` | $0.10 / $0.50 | ★★★★★ | ★★★☆☆ | ★★★☆☆ | **Scouts**: search, extraction, classification, routing, first-pass reads |
+| Haiku 5.5 | `haiku` | $0.10 / $0.50 (prompts ≤100k tokens; $0.50 / $2.50 above) | ★★★★★ | ★★★☆☆ | ★★★☆☆ | **Scouts**: search, extraction, classification, routing, first-pass reads |
 
 ## Routing heuristics
 

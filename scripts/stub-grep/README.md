@@ -24,9 +24,13 @@ change can touch: committed since the base, staged, unstaged, and untracked file
 Docs, lock files, snapshots, minified files, `node_modules`, and build output are
 skipped. Tests are still scanned.
 
+In CI, check out full history (`actions/checkout` with `fetch-depth: 0`) or pass
+`--base origin/main`. Without a main/master ref it can only scan uncommitted changes,
+and it says so on stderr.
+
 Use it as a step in `verify.sh` (see [verify-gate](../../hooks/verify-gate/)), in CI,
 or as the "substantive, not stubs" check of the
 [five-gates](../../skills/five-gates/) Verify gate.
 
-`test.sh` runs 11 fixture cases (pre-existing TODOs ignored, staged and untracked
-stubs caught, bad refs rejected).
+`test.sh` runs 12 fixture cases (pre-existing TODOs ignored, staged and untracked
+stubs caught, bad refs rejected, the no-base fallback warns).

@@ -93,5 +93,47 @@ mode fail; out "src/a.ts(7,7): error TS2322: committed"; run_hook "$AV" "$R"
 expect_block "av commit-turn verified" "committed"
 [ -z "$(git -C "$R" status --porcelain)" ] && ok || bad "av commit-turn: tree should be clean"
 
+# ---- review fixes: a fresh repo per scenario ----
+run_active() {  # like run_hook, but the stop follows a block (stop_hook_active=true)
+    printf '{"cwd":"%s","stop_hook_active":true}' "$2" | bash "$1" >"$T/out" 2>"$T/err"; RC=$?
+}
+fresh() {  # $1 dir: a committed repo sharing the fake verify.sh
+    mkdir -p "$1/src" "$1/.claude"; cp "$R/.claude/verify.sh" "$1/.claude/verify.sh"
+    printf 'export const a = 1;\n' > "$1/src/a.ts"; printf 'export const l = 1;\n' > "$1/src/legacy.ts"
+    git -C "$1" init -q 2>/dev/null; git_ "$1" add -A; git_ "$1" commit -m c0
+}
+
+# 7. no passing run on record: the reason says every error counts (it must not promise scoping it cannot do)
+R7="$T/r7"; fresh "$R7"; mode fail; out "src/legacy.ts(1,1): error TS2322: old"; edit "$R7/src/a.ts"; run_hook "$AV" "$R7"
+expect_block "no prior pass: blocks, says so" "no passing run is on record"
+
+# 8. stop_hook_active=true re-verifies (the fix is checked); identical failure still releases on the 3rd
+R8="$T/r8"; fresh "$R8"; mode fail; out "Build failed: r8"; edit "$R8/src/a.ts"
+run_hook "$AV" "$R8"; expect_block "active: block 1" "Build failed: r8" "block 1 of at most 4"
+run_active "$AV" "$R8"; expect_block "active: re-verified, block 2" "Build failed: r8" "block 2 of"
+mode pass; run_active "$AV" "$R8"; expect_silent "active: fixed build passes"
+
+# 9. the per-turn chain cap releases even when every failure differs
+R9="$T/r9"; fresh "$R9"; mode fail; edit "$R9/src/a.ts"
+out "Build failed: v1"; run_hook "$AV" "$R9"; expect_block "chain 1" "v1"
+for i in 2 3 4; do out "Build failed: v$i"; run_active "$AV" "$R9"; expect_block "chain $i" "v$i"; done
+out "Build failed: v5"; run_active "$AV" "$R9"; expect_silent "chain: 5th consecutive block releases"
+expect_event "chain released" auto-verify released-chain 1
+out "Build failed: v6"; edit "$R9/src/a.ts"; run_hook "$AV" "$R9"; expect_block "chain resets on a new turn" "v6" "block 1 of"
+
+# 10. a file inside a NEW untracked folder is seen (git status would only list the folder)
+R10="$T/r10"; fresh "$R10"; mode pass; edit "$R10/src/a.ts"; run_hook "$AV" "$R10"; expect_silent "r10 baseline pass"
+mode fail; out "Build failed: new folder"; mkdir -p "$R10/src/feature"; echo 'export {}' > "$R10/src/feature/x.ts"; future "$R10/src/feature/x.ts"
+run_hook "$AV" "$R10"; expect_block "new folder file triggers verify" "new folder"
+
+# 11. a delete-only turn is verified (the changed set differs from the last verified one)
+R11="$T/r11"; fresh "$R11"; mode pass; edit "$R11/src/a.ts"; run_hook "$AV" "$R11"; expect_silent "r11 baseline pass"
+mode fail; out "Build failed: missing module"; git -C "$R11" rm -q src/legacy.ts
+run_hook "$AV" "$R11"; expect_block "delete-only turn verified" "missing module"
+# ...and an unchanged set after a pass still debounces
+perl -e 'utime 1000000000,1000000000,$ARGV[0]' "$R11/src/a.ts"
+mode pass; run_hook "$AV" "$R11"; expect_silent "r11 pass after delete"
+mode fail; out "Build failed: should not run"; run_hook "$AV" "$R11"; expect_silent "same set, nothing newer: debounced"
+
 echo "verify-gate: $PASS passed, $FAILS failed"
 [ "$FAILS" -eq 0 ]

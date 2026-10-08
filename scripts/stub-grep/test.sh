@@ -33,5 +33,9 @@ rm "$R/src/new.ts"; printf 'return null; // stub\n' > "$R/src/s.ts"; g "$R" add 
 (cd "$R" && bash "$SG" --base nonexistent >/dev/null 2>&1); expect "bad base ref" 2 $?
 (cd "$T" && bash "$SG" >/dev/null 2>&1); expect "not a git repo" 2 $?
 
+# shallow / no-main checkout: falls back out loud
+N="$T/nomain"; mkdir -p "$N"; g "$N" init -q -b feature; echo x > "$N/a.ts"; g "$N" add -A; g "$N" commit -m c
+ERR=$( (cd "$N" && bash "$SG") 2>&1 >/dev/null ); case "$ERR" in *"no main/master ref"*) ok ;; *) bad "fallback is silent: $ERR" ;; esac
+
 echo "stub-grep: $PASS passed, $FAILS failed"
 [ "$FAILS" -eq 0 ]

@@ -2,6 +2,7 @@
 
 Used by pre-commit-gate.sh. Not a shell parser: it handles quotes, line
 continuations, unquoted newlines, heredoc bodies, `;` `&&` `||` `|` `( )` separators, and drops redirects.
+`inner_command` exposes the string a `bash -c STR` / `eval ARGS` wrapper runs, so callers can re-split it.
 Anything it cannot tokenise yields no segment, so callers fail open.
 """
 import os
@@ -12,6 +13,8 @@ ASSIGN = re.compile(r'^[A-Za-z_][A-Za-z0-9_]*=')
 HEREDOC = re.compile(r"<<-?\s*['\"]?([A-Za-z_][A-Za-z0-9_]*)['\"]?")
 WRAPPERS = {'sudo', 'command', 'builtin', 'exec', 'nohup', 'time', 'env', 'nice', 'xargs'}
 SEP = set(';&|()')
+SHELLS = {'bash', 'sh', 'zsh', 'dash'}
+SHELL_OPT_WITH_VALUE = {'-o', '+o', '--rcfile', '--init-file'}
 
 
 def logical_lines(cmd):
@@ -120,3 +123,29 @@ def git_parts(seg):
         else:
             i += 1
     return (seg[i] if i < len(seg) else ''), repo, seg[i + 1:]
+
+
+def inner_command(seg):
+    """The command string a wrapper runs, or None: `bash|sh|zsh|dash [-lc | -c | -ec ...] STR`, `eval ARGS...`.
+
+    `seg` must already be strip_prefix()ed. A shell given a script file (first non-option word) yields None.
+    """
+    if not seg:
+        return None
+    name = os.path.basename(seg[0])
+    if name == 'eval':
+        return ' '.join(seg[1:])
+    if name not in SHELLS:
+        return None
+    i = 1
+    while i < len(seg):
+        a = seg[i]
+        if a in SHELL_OPT_WITH_VALUE:
+            i += 2
+        elif a == '--' or not a.startswith(('-', '+')):
+            return None
+        elif a.startswith('-') and not a.startswith('--') and 'c' in a[1:]:
+            return seg[i + 1] if i + 1 < len(seg) else None
+        else:
+            i += 1
+    return None

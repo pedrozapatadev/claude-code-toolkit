@@ -44,7 +44,7 @@ instead (see Calibration).
 
 - Every stage needs an externally checkable, **failable** pass condition: a command that can exit non-zero, a render you can inspect, a test that can go red. If it cannot fail, it is not verification. "Looks right" and "should work" don't count.
 - Verify the goal, not the task list: files exist → contents are substantive (not stubs) → pieces are wired together → behavior is proven by running something.
-- **Stub scan** on every diff (`stub-grep.sh` in this toolkit). Red flags: placeholder returns, empty handlers (`onClick={() => {}}`), console.log-only logic, an API route returning a constant, a `fetch` never awaited, state that is never rendered, hardcoded values where dynamic ones are expected.
+- **Stub scan** on every diff (for example [`stub-grep.sh`](https://github.com/pedrozapatadev/claude-code-toolkit/tree/main/scripts/stub-grep), which reports markers in added lines only). Red flags: placeholder returns, empty handlers (`onClick={() => {}}`), console.log-only logic, an API route returning a constant, a `fetch` never awaited, state that is never rendered, hardcoded values where dynamic ones are expected.
 - **Minimum evidence by work type:**
 
   | Work type | Minimum evidence |
@@ -73,7 +73,7 @@ instead (see Calibration).
 - Effort scales with difficulty × cost of being wrong. A typo fix gets every gate in a few seconds; a migration or an auth change gets every gate at full depth.
 - More reasoning effort is not always better: maximum effort can overthink, re-deriving settled steps and second-guessing verified evidence. Once the plan is confirmed and the step is mechanical, lower the effort and execute.
 - Scale tool calls to the question: ~1 for a single fact, 3–5 for a medium task, 5–10 for deep research. Past your band, ask why you are still gathering instead of acting.
-- Route cheap, well-specified work (renames, boilerplate, bulk scans) to smaller models or subagents; keep heavy reasoning for root-causing, design decisions and adversarial review. See `rules/model-routing`.
+- Route cheap, well-specified work (renames, boilerplate, bulk scans) to smaller models or subagents; keep heavy reasoning for root-causing, design decisions and adversarial review. See the [model-routing rule](https://github.com/pedrozapatadev/claude-code-toolkit/tree/main/rules/model-routing).
 
 ## Long-Run Autonomy
 
